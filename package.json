@@ -1,0 +1,17 @@
+{
+  "name": "maker-skill-tree-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Shane Gadsby <schme16@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "mongodb": "^4.6.0"
+  }
+}
