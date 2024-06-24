@@ -32,8 +32,11 @@
 
 <div class="buttons">
 	<button ng-click="saveSVG()">Save</button>
+	<button onclick="document.querySelector('#load_svg').click()" >Load</button>
+	<input id="load_svg" name="load_svg" type="file" accept=".svg" onchange="m.loadSVG(event)" hidden/>
+
 </div>
-<div class="output">
+<div class="output" hidden>
 </div>
 
 

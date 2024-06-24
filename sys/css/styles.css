@@ -68,8 +68,8 @@ html, body {
 
 foreignObject {
     /* fill: red; */
-    width: 125px;
-    height: 74px;
+    /* width: 125px; */
+    /* height: 74px; */
 }
 
 .textbox-wrapper {
@@ -166,4 +166,19 @@ text {
 
 tspan {
     /* x: 50px; */
+}
+
+input {
+    overflow: visible;
+    width: calc(100% - 3px);
+    border: 0;
+    outline: 0;
+    line-height: 1.3;
+}
+
+
+.buttons {
+    position: fixed;
+    top: 20px;
+    right:20px;
 }
