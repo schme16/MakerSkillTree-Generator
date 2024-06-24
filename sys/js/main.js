@@ -159,7 +159,7 @@ angular.module('Maker Skill Tree', [])
 				styles = await $.get('sys/css/styles.css'),
 				styleElement = svgDoc.querySelector('style')
 
-			styles = styles.replaceAll('../fonts/', 'https://github.com/schme16/MakerSkillTree-Generator/raw/main/public/sys/fonts/')
+			styles = styles.replaceAll('../fonts/', 'https://schme16.github.io/MakerSkillTree-Generator/sys/fonts/')
 
 			styleElement.innerHTML += styles
 
