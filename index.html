@@ -3,23 +3,24 @@
 <head>
 
 	<!--Stylesheets-->
-	<link rel="stylesheet" async defer type="text/css" href="node_modules/normalize.css/normalize.css">
-	<link rel="stylesheet" async defer type="text/css" href="node_modules/@openfonts/open-sans_all/index.css">
-	<link rel="stylesheet" async defer type="text/css" href="node_modules/font-awesome/css/font-awesome.min.css">
-	<link rel="stylesheet" type="text/css" href="node_modules/tippy.js/dist/tippy.css">
-	<link rel="stylesheet" type="text/css" href="node_modules/tippy.js/dist/backdrop.css">
-	<link rel="stylesheet" type="text/css" href="node_modules/tippy.js/dist/border.css">
-	<link rel="stylesheet" type="text/css" href="node_modules/tippy.js/dist/svg-arrow.css">
-	<link rel="stylesheet" type="text/css" href="node_modules/tippy.js/themes/light.css">
+	<link rel="stylesheet" async defer type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+	<link rel="stylesheet" async defer type="text/css" href="https://cdn.jsdelivr.net/npm/@openfonts/open-sans_all@1.44.2/index.min.css">
+	<!--<link rel="stylesheet" async defer type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
+	<link rel="stylesheet" async defer type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular-csp.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.7/tippy.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.7/backdrop.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.7/border.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.7/svg-arrow.min.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.7/themes/light.min.css">
 	<link rel="stylesheet" type="text/css" href="sys/css/styles.css">
 	
 
 	<!--Scripts-->
-	<script src="node_modules/jquery/dist/jquery.min.js"></script>
-	<script src="node_modules/angular/angular.min.js"></script>
-	<script src="node_modules/@shopify/draggable/build/umd/index.min.js"></script>
-	<script src="node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
-	<script src="node_modules/tippy.js/dist/tippy.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.1.3/build/umd/index.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.7/tippy-bundle.umd.min.js"></script>
 
 	<!--The title-->
 	<title>Maker Skill Tree Generator</title>
@@ -28,7 +29,7 @@
 </head>
 <body ng-cloak>
 
-<div class="skill-tree-wrapper" ng-include="'MakerSkillTree/Template Skill Tree/Template Maker Skill Tree.svg'"></div>
+<div class="skill-tree-wrapper" ng-include="'sys/img/Template Maker Skill Tree.svg'"></div>
 
 <div class="buttons">
 	<button ng-click="saveSVG()">Save</button>
