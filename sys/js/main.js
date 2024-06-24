@@ -169,6 +169,22 @@ angular.module('Maker Skill Tree', [])
 			styles = styles.replaceAll('UniformCondensedRegular-Regular', 'Uniform-Condensed6')
 			styleElement.innerHTML += styles
 
+			//convert inputs to svg text
+			;[...svgDoc.querySelectorAll('input')].forEach(el => {
+				let text = document.createElement('text')
+				text.setAttribute('x', 420.95)
+				text.setAttribute('y', 65)
+				text.setAttribute('class', 'cls-19 header')
+				text.setAttribute('text-anchor', 'middle')
+				
+				
+				text.innerText = el.value
+
+				svgDoc.appendChild(text)
+				el.remove()
+			})
+
+			//Remove straggler html content
 			;[...svgDoc.querySelectorAll('input, foreignObject, div, p')].forEach(el => {
 				el.remove()
 			})
@@ -195,7 +211,7 @@ angular.module('Maker Skill Tree', [])
 			svgDoc.prepend(jsonElement)
 
 
-			let fileContent = svgDoc.outerHTML,
+			let fileContent = svgDoc.outerHTML.replaceAll('&quot;', `'`),
 				bb = new Blob([fileContent], {type: 'image/svg+xml'}),
 				a = document.createElement('a')
 
@@ -206,7 +222,8 @@ angular.module('Maker Skill Tree', [])
 
 
 			document.querySelector('.output').replaceChildren();
-			return svgDoc.outerHTML
+
+			return fileContent
 		}
 
 		m.loadSVG = (event) => {
@@ -270,20 +287,21 @@ angular.module('Maker Skill Tree', [])
 			return fO
 		}
 
-		m.createEditableName = (svg, scope, compile) => {
+		m.createEditableTitle = (svg, scope, compile) => {
 			let fO = m.createEditableForeignObject(scope, compile, 'data.title', 'Enter a title...')
 
-			fO.setAttribute('x', 100)
-			fO.setAttribute('y', 52)
-			fO.setAttribute('width', 707)
-			fO.setAttribute('height', 24)
+			fO.setAttribute('x', 0)
+			fO.setAttribute('y', -4)
+			fO.setAttribute('width', 841.89)
+			fO.setAttribute('height', 78)
+			fO.setAttribute('class', 'header')
 
 
 			svg.appendChild(fO)
 			return fO
 		}
 
-		m.createEditableTitle = (svg, scope, compile) => {
+		m.createEditableName = (svg, scope, compile) => {
 			let fO = m.createEditableForeignObject(scope, compile, 'data.name', 'Enter your name...')
 
 			fO.setAttribute('x', 125)
@@ -380,16 +398,13 @@ angular.module('Maker Skill Tree', [])
 
 				})
 
-
 				element.find('.cls-16').on('click', () => {
 					window.open('https://github.com/sjpiper145/MakerSkillTree', '_blank').focus();
 				})
 
-
 				element.find('.cls-11').on('click', () => {
 					window.open('https://icons8.com', '_blank').focus();
 				})
-
 
 				m.sortHexagonals = new Draggable.Swappable(document.querySelectorAll('foreignObject'), {
 					draggable: '.textbox-wrapper',
@@ -435,7 +450,7 @@ angular.module('Maker Skill Tree', [])
 
 				let startX, startY;
 
-				m.createEditableName(svg, scope, $compile)
+				//m.createEditableName(svg, scope, $compile)
 				m.createEditableTitle(svg, scope, $compile)
 			}
 		}
