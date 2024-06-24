@@ -165,6 +165,8 @@ angular.module('Maker Skill Tree', [])
 
 			styles = styles.replaceAll('../fonts/', 'https://schme16.github.io/MakerSkillTree-Generator/sys/fonts/')
 
+			styles = styles.replaceAll('Uniform Condensed Regular', 'Uniform-Condensed6')
+			styles = styles.replaceAll('UniformCondensedRegular-Regular', 'Uniform-Condensed6')
 			styleElement.innerHTML += styles
 
 			;[...svgDoc.querySelectorAll('input, foreignObject, div, p')].forEach(el => {
