@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html ng-app="Maker Skill Tree" lang="en" ng-controller="master">
+<head>
+
+	<!--Stylesheets-->
+	<link rel="stylesheet" async defer type="text/css" href="node_modules/normalize.css/normalize.css">
+	<link rel="stylesheet" async defer type="text/css" href="node_modules/@openfonts/open-sans_all/index.css">
+	<link rel="stylesheet" async defer type="text/css" href="node_modules/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="node_modules/tippy.js/dist/tippy.css">
+	<link rel="stylesheet" type="text/css" href="node_modules/tippy.js/dist/backdrop.css">
+	<link rel="stylesheet" type="text/css" href="node_modules/tippy.js/dist/border.css">
+	<link rel="stylesheet" type="text/css" href="node_modules/tippy.js/dist/svg-arrow.css">
+	<link rel="stylesheet" type="text/css" href="node_modules/tippy.js/themes/light.css">
+	<link rel="stylesheet" type="text/css" href="sys/css/styles.css">
+	
+
+	<!--Scripts-->
+	<script src="node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="node_modules/angular/angular.min.js"></script>
+	<script src="node_modules/@shopify/draggable/build/umd/index.min.js"></script>
+	<script src="node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
+	<script src="node_modules/tippy.js/dist/tippy.umd.min.js"></script>
+
+	<!--The title-->
+	<title>Maker Skill Tree Generator</title>
+
+
+</head>
+<body ng-cloak>
+
+<div class="skill-tree-wrapper" ng-include="'MakerSkillTree/Template Skill Tree/Template Maker Skill Tree.svg'"></div>
+
+<div class="buttons">
+	<button ng-click="saveSVG()">Save</button>
+</div>
+<div class="output">
+</div>
+
+
+<script src="sys/js/main.js"></script>
+</body>
+</html>
+
