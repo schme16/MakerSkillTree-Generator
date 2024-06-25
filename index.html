@@ -24,6 +24,11 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.7/tippy-bundle.umd.min.js"></script>
 
+	<script src="sys/js/fonts.js"></script>
+	<script src="sys/js/jspdf.umd.min.js"></script>
+	<script src="sys/js/svg2pdf.umd.min.js"></script>
+
+
 	<!--The title-->
 	<title>Maker Skill Tree Generator</title>
 
@@ -36,11 +41,12 @@
 <div class="buttons">
 	<button ng-click="saveSVG()">Save</button>
 	<button onclick="document.querySelector('#load_svg').click()">Load</button>
+	<button ng-click="saveAsPDF()">Export as PDF</button>
 	<input id="load_svg" name="load_svg" type="file" accept=".svg" onchange="m.loadSVG(event)" hidden/>
 
 </div>
-<div class="output">
-</div>
+
+<div class="output"></div>
 
 
 <script src="sys/js/main.js"></script>

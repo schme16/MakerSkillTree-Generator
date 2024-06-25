@@ -10,6 +10,18 @@ angular.module('Maker Skill Tree', [])
 			items: {}
 		}
 
+		m.preventLeaveFlag = false
+
+		m.skipPreventLeaveFlag = true
+
+		;(async () => {
+			m.styles = await $.get('sys/css/styles.css')
+			m.styles = m.styles.replaceAll('../fonts/', 'https://schme16.github.io/MakerSkillTree-Generator/sys/fonts/')
+				.replaceAll('Uniform Condensed Regular', 'Uniform-Condensed6')
+				.replaceAll('UniformCondensedRegular-Regular', 'Uniform-Condensed6')
+		})();
+
+
 		//Trust a string as rendereable HTML
 		m.trustAsHtml = $sce.trustAsHtml
 
@@ -138,6 +150,7 @@ angular.module('Maker Skill Tree', [])
 
 				textElement.setAttribute('class', 'textbox-inner ')
 				textElement.setAttribute('text-anchor', 'middle')
+				textElement.setAttribute('font-family', 'Uniform-Condensed6')
 
 
 				// Handle multi-line text by creating tspan elements
@@ -157,7 +170,7 @@ angular.module('Maker Skill Tree', [])
 			return svgDoc
 		}
 
-		m.saveSVG = async (svg = document.querySelector('svg')) => {
+		m.saveSVG = async (svg = document.querySelector('svg'), pdfOnly) => {
 
 			if (document.querySelector('.output svg')) {
 				document.querySelector('.output svg').remove()
@@ -166,27 +179,28 @@ angular.module('Maker Skill Tree', [])
 			document.querySelector('.output').appendChild(svg.cloneNode(true))
 
 			let svgDoc = m.convertForeignObjectsToText(document.querySelector('.output svg')),
-
-				styles = await $.get('sys/css/styles.css'),
 				styleElement = svgDoc.querySelector('style')
 
-			styles = styles.replaceAll('../fonts/', 'https://schme16.github.io/MakerSkillTree-Generator/sys/fonts/')
-
-			styles = styles.replaceAll('Uniform Condensed Regular', 'Uniform-Condensed6')
-			styles = styles.replaceAll('UniformCondensedRegular-Regular', 'Uniform-Condensed6')
-			styleElement.innerHTML += styles
+			styleElement.innerHTML += m.styles
 
 			//convert inputs to svg text
 			;[...svgDoc.querySelectorAll('input')].forEach(el => {
 				let text = document.createElement('text')
-				text.setAttribute('x', 420.95)
-				text.setAttribute('y', 65)
+				text.setAttribute('x', "0")
+				text.setAttribute('y', "0")
 				text.setAttribute('class', 'cls-19 header')
 				text.setAttribute('text-anchor', 'middle')
 
-				text.innerText = el.value
+				let tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+				tspan.setAttribute('text-anchor', 'middle')
+				tspan.setAttribute('x', "420.95");
+				tspan.setAttribute('class', 'cls-19 header')
+				tspan.setAttribute('y', "65");
+				tspan.textContent = el.value;
 
+				text.appendChild(tspan);
 				svgDoc.appendChild(text)
+				window.text = text
 				el.remove()
 			})
 
@@ -216,21 +230,93 @@ angular.module('Maker Skill Tree', [])
 
 
 			svgDoc.prepend(jsonElement)
+			let fileContent = svgDoc.outerHTML.replaceAll('&quot;', `'`)
+
+			if (!pdfOnly) {
+				let bb = new Blob([fileContent], {type: 'image/svg+xml'}),
+					a = document.createElement('a')
+
+				let title = (newData.title || 'Untitled').replace(/[^a-z0-9]/gi, '_').toLowerCase().trim()
+				a.download = `MakerSkillTree - ${title}.svg`
+				a.href = window.URL.createObjectURL(bb)
+				a.click()
 
 
-			let fileContent = svgDoc.outerHTML.replaceAll('&quot;', `'`),
-				bb = new Blob([fileContent], {type: 'image/svg+xml'}),
-				a = document.createElement('a')
-
-			let title = (newData.title || 'Untitled').replace(/[^a-z0-9]/gi, '_').toLowerCase().trim()
-			a.download = `MakerSkillTree - ${title}.svg`
-			a.href = window.URL.createObjectURL(bb)
-			a.click()
+				m.preventLeaveFlag = false
+				m.$applyAsync()
+				return svgDoc
+			}
+			else {
 
 
-			document.querySelector('.output').replaceChildren();
+				//Fix the pdf text tile alignment
+				;[...document.querySelectorAll('.output svg .textbox-inner, .output svg .textbox-inner tspan')].forEach(el => {
+					el.setAttribute('x', parseFloat(el.getAttribute('x')) + 6.5)
+				})
 
-			return fileContent
+				let headerText = svgDoc.querySelector('text.header')
+				console.log(111111, headerText)
+
+				svgDoc.removeChild(headerText)
+				svgDoc.appendChild(headerText)
+
+				let svgData = svgDoc.outerHTML
+				document.querySelector('.output').replaceChildren();
+				document.querySelector('.output').innerHTML = svgData
+				svgDoc = document.querySelector('.output svg')
+				headerText = svgDoc.querySelector('tspan.header')
+				svgDoc.querySelector('text.header').removeAttribute('text-anchor')
+				headerText.removeAttribute('text-anchor')
+
+				headerText.parentElement.setAttribute('transform', 'translate(-5,0)')
+				await m.centerSvgText(svgDoc, headerText)
+
+				let decriptionTspans = [...svgDoc.querySelectorAll('#description tspan')];
+
+				for (let el of decriptionTspans) {
+					let oX = parseFloat(el.getAttribute('x')),
+						x = (oX + 70).toString()
+					el.setAttribute('x', x)
+				}
+
+
+				let credits = svgDoc.querySelector('#credits tspan'),
+					creditsOX = parseFloat(credits.getAttribute('x')),
+					creditsX = (creditsOX - 34).toString()
+
+				credits.setAttribute('x', creditsX)
+
+
+				return svgDoc
+			}
+
+		}
+
+		m.saveAsPDF = () => {
+			m.saveSVG(document.querySelector('svg'), true).then(content => {
+				m.convertSvgToPdf()
+			})
+		}
+
+		m.centerSvgText = (svg, text) => {
+			return new Promise((resolve, reject) => {
+				requestAnimationFrame(() => {
+					try {
+						let textWidth = text.getBBox().width,
+							oX = parseFloat(text.getAttribute('x')),
+							x = (oX - textWidth / 2).toString()
+
+						console.log(x)
+						// Set the x attribute of the text element
+						text.setAttribute('x', x);
+
+						resolve();
+					}
+					catch (error) {
+						reject(error);
+					}
+				})
+			})
 		}
 
 		m.loadSVG = (event) => {
@@ -280,6 +366,38 @@ angular.module('Maker Skill Tree', [])
 				reader.readAsText(file);
 			}
 
+		}
+
+		m.convertSvgToPdf = async (content) => {
+			const {jsPDF} = window.jspdf
+
+			const svgElement = document.querySelector('.output').firstElementChild
+			svgElement.getBoundingClientRect() // force layout calculation
+			const width = svgElement.width.baseVal.value
+			const height = svgElement.height.baseVal.value
+			const pdf = new jsPDF(width > height ? 'l' : 'p', 'px', [width, height])
+
+
+			// Add fonts to jsPDF
+			pdf.addFileToVFS('Hansief.otf', hansiefFont);
+			pdf.addFont('Hansief.otf', 'Hansief', 'normal');
+
+			pdf.addFileToVFS('UniformCondensed.ttf', uniformCondensedFont);
+			pdf.addFont('UniformCondensed.ttf', 'Uniform-Condensed6', 'normal');
+
+			await pdf.svg(svgElement, {width, height})
+
+
+			// Convert SVG to PDF
+			svg2pdf.svg2pdf(svgElement, pdf, {
+				xOffset: 0,
+				yOffset: 0,
+				scale: 1
+			});
+
+			// Save the PDF
+			pdf.save('output.pdf');
+			document.querySelector('.output').replaceChildren();
 		}
 
 		m.createEditableForeignObject = (scope, $compile, ngModel, placeholder) => {
@@ -394,13 +512,6 @@ angular.module('Maker Skill Tree', [])
 
 		}
 
-
-		/**
-		 * I normalize the white-space in the given value such that the amount of white-
-		 * space matches the rendered white-space (browsers collapse strings of white-space
-		 * down to single space character, visually, and this is just updating the text to
-		 * match that behavior).
-		 */
 		m.collapseWhiteSpace = (value) => {
 			if (value == '\n') {
 				value = null
@@ -409,6 +520,24 @@ angular.module('Maker Skill Tree', [])
 
 		}
 
+		m.$watch('data', (o, n) => {
+
+			if (!m.skipPreventLeaveFlag) {
+				console.log(111111)
+				m.preventLeaveFlag = true
+			}
+			else {
+				console.log(222222)
+				m.skipPreventLeaveFlag = false
+			}
+			m.$applyAsync()
+		}, true)
+
+		window.onbeforeunload = function () {
+			if (m.preventLeaveFlag) {
+				return "Are you sure you want to navigate away?";
+			}
+		}
 
 		window.addEventListener('keydown', (e) => {
 			if (e.key == 's' && e.ctrlKey) {
@@ -443,6 +572,8 @@ angular.module('Maker Skill Tree', [])
 					poly.id = id
 					m.convertPolyToPath(poly)
 				})
+
+				m.editTileContent = await $.get(`sys/popups/edit-text.html`)
 
 				//Convert the hexagonals to paths
 				let paths = [...document.querySelectorAll(hexagonalQuerySelector)],
@@ -487,7 +618,6 @@ angular.module('Maker Skill Tree', [])
 					},
 					index = 0
 
-
 				paths.forEach((path) => {
 					let pos = m.getTopLeftPointOfPath(path),
 						{
@@ -519,34 +649,7 @@ angular.module('Maker Skill Tree', [])
 				})
 
 				m.sortHexagonals.on('drag:stop', (a, b, c) => {
-					/*setTimeout(() => {
-
-						let fOs = [...document.querySelectorAll('.textbox-wrapper')];
-
-						let old = {}
-						for (let i in fOs) {
-							let parentIndex = fOs[i].parentElement.getAttribute('index'),
-								index = fOs[i].getAttribute('index')
-
-							if (parentIndex != index) {
-
-								old[parentIndex] = m.data.items[parentIndex]
-								
-								m.data.items[parentIndex] = m.data.items[index]
-								
-								m.data.items[index] = old[parentIndex]
-
-								fOs[i].setAttribute('index', parentIndex)
-
-
-							}
-							else {
-							}
-						}
-
-						m.$applyAsync()
-
-					}, 250)*/
+					m.preventLeaveFlag = true
 				})
 
 				let startX, startY;
@@ -569,7 +672,7 @@ angular.module('Maker Skill Tree', [])
 
 				let credits = document.querySelector('#credits')
 
-				function scaleSVGText(svgTextElement) {
+				m.scaleSVGText = (svgTextElement) => {
 					// Define the constraints
 					const maxWidth = 570;
 					const minFontSize = 11;
@@ -592,7 +695,6 @@ angular.module('Maker Skill Tree', [])
 
 						const width = tempSVG.getBoundingClientRect().width;
 
-						console.log(width)
 
 						tempSVG.setAttribute("hidden", 'hidden')
 						return width;
@@ -615,14 +717,13 @@ angular.module('Maker Skill Tree', [])
 						}
 					}
 
-					console.log(optimalFontSize)
 					// Set the optimal font size to the SVG text element
 					svgTextElement.setAttribute("style", `font-size: ${optimalFontSize}px !important`);
 				}
 
 				m.$watch('data.credits', () => {
 					setTimeout(() => {
-						scaleSVGText(credits)
+						m.scaleSVGText(credits)
 					}, 100)
 				}, true)
 
@@ -634,6 +735,8 @@ angular.module('Maker Skill Tree', [])
 
 	.directive('textboxInner', ($compile) => {
 		let index = 0
+
+
 		return {
 			restrict: 'C',
 			scope: true,
@@ -645,7 +748,7 @@ angular.module('Maker Skill Tree', [])
 				index++
 
 				buildTip = async (element) => {
-					let content = $compile(await $.get(`sys/popups/edit-text.html`), null, 1)(scope)[0]
+					let content = $compile(m.editTileContent, null, 1)(scope)[0]
 
 					if (scope.tip) {
 						scope.tip.destroy()
