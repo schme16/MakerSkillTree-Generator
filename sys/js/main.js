@@ -581,7 +581,7 @@ angular.module('Maker Skill Tree', [])
 						//sticky: 'popper',
 
 						allowHTML: true,
-						placement: 'auto-start',
+						placement: 'bottom',
 						theme: 'light',
 						content: content,
 						onShow: () => {
