@@ -5,6 +5,8 @@ angular.module('Maker Skill Tree', [])
 		m = $scope
 
 		m.data = {
+			title: '',
+			credits: 'STEPH PIPER - MAKERQUEEN AU',
 			items: {}
 		}
 
@@ -114,7 +116,7 @@ angular.module('Maker Skill Tree', [])
 					computedStyle,
 					lines
 
-				
+
 				//Make some position adjustments
 				x = x + 62.5
 				y += 1
@@ -189,7 +191,7 @@ angular.module('Maker Skill Tree', [])
 			})
 
 			//Remove straggler html content
-			;[...svgDoc.querySelectorAll('input, foreignObject, div, p')].forEach(el => {
+			;[...svgDoc.querySelectorAll('input, foreignObject, div, p, [hidden]')].forEach(el => {
 				el.remove()
 			})
 
@@ -258,6 +260,9 @@ angular.module('Maker Skill Tree', [])
 
 				if (json) {
 					m.data = json
+					if (!m.data.credits) {
+						m.data.credits = 'STEPH PIPER - MAKERQUEEN AU'
+					}
 					document.querySelector("input[type=file]").value = '',
 						fOs = [...document.querySelectorAll('.textbox-wrapper')]
 
@@ -424,7 +429,7 @@ angular.module('Maker Skill Tree', [])
 		return {
 			restrict: 'C',
 			scope: true,
-			link: (scope, element, attrs) => {
+			link: async (scope, element, attrs) => {
 
 				let svg = element.find('svg')[0],
 					hexagonalQuerySelector = `.cls-12:not([d="M 208.2 236.93 176.95 199.6 208.2 162.26 270.72 162.26 301.98 199.6 270.72 236.93 208.2 236.93z"]):not([d="M 104.3 278.54 73.04 241.2 104.3 203.87 166.81 203.87 198.07 241.2 166.81 278.54 104.3 278.54z"]):not([d="M 414.37 237.55 383.12 200.21 414.37 162.88 476.89 162.88 508.14 200.21 476.89 237.55 414.37 237.55z"]):not([d="M 620.54 237.8 589.28 200.46 620.54 163.13 683.05 163.13 714.31 200.46 683.05 237.8 620.54 237.8z"]):not([d="M 722.8 280.01 691.54 242.68 722.8 205.34 785.32 205.34 816.57 242.68 785.32 280.01 722.8 280.01z"])`
@@ -545,6 +550,81 @@ angular.module('Maker Skill Tree', [])
 				})
 
 				let startX, startY;
+
+
+				scope.creditsTip = tippy(document.querySelector('#credits'), {
+					trigger: 'click',
+					triggerTarget: document.querySelector('#credits'),
+					appendTo: document.body,
+					interactive: true,
+					interactiveBorder: 10,
+					interactiveDebounce: 16,
+					//sticky: 'popper',
+
+					allowHTML: true,
+					placement: 'bottom',
+					theme: 'light',
+					content: $compile(await $.get(`sys/popups/edit-credits.html`), null, 1)(scope)[0],
+				})
+
+				let credits = document.querySelector('#credits')
+
+				function scaleSVGText(svgTextElement) {
+					// Define the constraints
+					const maxWidth = 570;
+					const minFontSize = 11;
+					const maxFontSize = 16;
+
+					// Create a temporary SVG text element to measure the text width
+					const tempSVG = document.querySelector('#credits_test'),
+						svgDoc = document.querySelector('svg:not(.output svg)')
+
+
+					// Function to get the text width for a given font size
+					function getTextWidth(fontSize) {
+						tempSVG.setAttribute("style", `font-size: ${fontSize}px !important`);
+
+						tempSVG.removeAttribute("hidden")
+
+						// Force reflow to ensure the element is rendered and the bounding box is accurate
+						svgDoc.removeChild(tempSVG);
+						svgDoc.appendChild(tempSVG);
+
+						const width = tempSVG.getBoundingClientRect().width;
+
+						console.log(width)
+
+						tempSVG.setAttribute("hidden", 'hidden')
+						return width;
+					}
+
+					// Binary search to find the optimal font size
+					let low = minFontSize;
+					let high = maxFontSize;
+					let optimalFontSize = minFontSize;
+
+					while (low <= high) {
+						const mid = Math.floor((low + high) / 2);
+						const width = getTextWidth(mid);
+						if (width <= maxWidth) {
+							optimalFontSize = mid;
+							low = mid + 1;
+						}
+						else {
+							high = mid - 1;
+						}
+					}
+
+					console.log(optimalFontSize)
+					// Set the optimal font size to the SVG text element
+					svgTextElement.setAttribute("style", `font-size: ${optimalFontSize}px !important`);
+				}
+
+				m.$watch('data.credits', () => {
+					setTimeout(() => {
+						scaleSVGText(credits)
+					}, 100)
+				}, true)
 
 				//m.createEditableName(svg, scope, $compile)
 				m.createEditableTitle(svg, scope, $compile)

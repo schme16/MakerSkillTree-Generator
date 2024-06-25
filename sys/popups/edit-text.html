@@ -1,5 +1,5 @@
 ﻿<div class="textbox-inner-edit">
 	<!--<div class="textbox-inner-edit-title">Edit:</div>-->
-	<textarea placeholder="Enter text here" rows="6" class="textbox-inner-edit-text" wrap="hard" ng-model="data.items[index]"></textarea>
+	<textarea placeholder="Enter text here" rows="6" class="textbox-inner-edit-text" wrap="hard" onpaste="m.data.credits = this.value;m.$applyAsync()" ng-model="data.items[index]"></textarea>
 	<button ng-click="tip.hide()">OK</button>
 </div>

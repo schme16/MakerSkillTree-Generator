@@ -70,6 +70,7 @@ foreignObject {
     /* fill: red; */
     /* width: 125px; */
     /* height: 74px; */
+    outline: none !important;
 }
 
 .textbox-wrapper {
@@ -197,4 +198,49 @@ input {
 
 #description text {
     font-size: 9.5px;
+}
+
+.credits-edit-text {
+    border: 1px solid #cacaca;
+    padding: 5px 6px;
+    text-transform: uppercase;
+    width: 540px;
+    text-align: center;
+}
+
+text#credits {
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: font-size 250ms ease-in-out;
+}
+
+#credits.font-size-15 {
+    font-size:15px !important;
+}
+
+#credits.font-size-14 {
+    font-size:14px !important;
+}
+
+#credits.font-size-13 {
+    font-size:13px !important;
+}
+
+#credits.font-size-12 {
+    font-size:12px !important;
+}
+
+#credits.font-size-11 {
+    font-size:11px !important;
+}
+
+
+.tippy-box {
+    max-width: unset !important;
+    width: fit-content;
+}
+
+[data-tippy-root] {
+    max-width: unset;
+    width: fit-content;
 }
