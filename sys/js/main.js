@@ -95,14 +95,15 @@ angular.module('Maker Skill Tree', [])
 
 			foreignObjects.forEach(foreignObject => {
 				// Extract the text content and styles from the foreignObject
-				let div = foreignObject.querySelector('div')
+				let div = foreignObject.querySelector('p')
 
 				// Skip if no div is found
 				if (!div) {
 					return;
 				}
 
-				let textContent = div.textContent.trim(),
+				let cleanedText = m.extractLinesFromTextNode(div.firstChild),
+					textContent = cleanedText.join('\n'),
 					{
 						x,
 						y,
@@ -113,6 +114,7 @@ angular.module('Maker Skill Tree', [])
 					computedStyle,
 					lines
 
+				
 				//Make some position adjustments
 				x = x + 62.5
 				y += 1
@@ -128,10 +130,13 @@ angular.module('Maker Skill Tree', [])
 
 				// Copy over relevant styles
 				computedStyle = getComputedStyle(div);
-				textElement.setAttribute('font-family', computedStyle.fontFamily)
-				textElement.setAttribute('font-size', computedStyle.fontSize)
+				/*textElement.setAttribute('font-family', computedStyle.fontFamily)
+				textElement.setAttribute('font-size', computedStyle.fontSize)*/
+				/*textElement.setAttribute('fill', computedStyle.color)*/
+
+				textElement.setAttribute('class', 'textbox-inner ')
 				textElement.setAttribute('text-anchor', 'middle')
-				textElement.setAttribute('fill', computedStyle.color)
+
 
 				// Handle multi-line text by creating tspan elements
 				lines = textContent.split('\n');
@@ -176,8 +181,7 @@ angular.module('Maker Skill Tree', [])
 				text.setAttribute('y', 65)
 				text.setAttribute('class', 'cls-19 header')
 				text.setAttribute('text-anchor', 'middle')
-				
-				
+
 				text.innerText = el.value
 
 				svgDoc.appendChild(text)
@@ -206,7 +210,8 @@ angular.module('Maker Skill Tree', [])
 			newData.items = newItems
 
 			let jsonElement = document.createElement('json')
-			jsonElement.innerHTML = btoa(angular.toJson(newData))
+			jsonElement.innerHTML = btoa(encodeURIComponent(angular.toJson(newData)))
+
 
 			svgDoc.prepend(jsonElement)
 
@@ -240,7 +245,7 @@ angular.module('Maker Skill Tree', [])
 
 				let json
 				try {
-					json = JSON.parse(atob(raw.innerHTML))
+					json = JSON.parse(decodeURIComponent(atob(raw.innerHTML)))
 				}
 				catch (e) {
 					console.log("Error:", e)
@@ -313,6 +318,99 @@ angular.module('Maker Skill Tree', [])
 			return fO
 		}
 
+		m.extractLinesFromTextNode = (textNode) => {
+
+			if (textNode.nodeType !== 3) {
+				throw (new Error("Lines can only be extracted from text nodes."));
+			}
+
+			// BECAUSE SAFARI: None of the "modern" browsers seem to care about the actual
+			// layout of the underlying markup. However, Safari seems to create range
+			// rectangles based on the physical structure of the markup (even when it
+			// makes no difference in the rendering of the text). As such, let's rewrite
+			// the text content of the node to REMOVE SUPERFLUOS WHITE-SPACE. This will
+			// allow Safari's .getClientRects() to work like the other modern browsers.
+			textNode.textContent = m.collapseWhiteSpace(textNode.textContent);
+
+			// A Range represents a fragment of the document which contains nodes and
+			// parts of text nodes. One thing that's really cool about a Range is that we
+			// can access the bounding boxes that contain the contents of the Range. By
+			// incrementally adding characters - from our text node - into the range, and
+			// then looking at the Range's client rectangles, we can determine which
+			// characters belong in which rendered line.
+			let textContent = textNode.textContent,
+				range = document.createRange(),
+				lines = [],
+				lineCharacters = []
+
+			// Iterate over every character in the text node.
+			for (let i = 0; i < textContent.length; i++) {
+
+				// Set the range to span from the beginning of the text node up to and
+				// including the current character (offset).
+				range.setStart(textNode, 0);
+				range.setEnd(textNode, (i + 1));
+
+				// At this point, the Range's client rectangles will include a rectangle
+				// for each visually-rendered line of text. Which means, the last
+				// character in our Range (the current character in our for-loop) will be
+				// the last character in the last line of text (in our Range). As such, we
+				// can use the current rectangle count to determine the line of text.
+				var lineIndex = (range.getClientRects().length - 1);
+
+				// If this is the first character in this line, create a new buffer for
+				// this line.
+				if (!lines[lineIndex]) {
+
+					lines.push(lineCharacters = []);
+
+				}
+
+				// Add this character to the currently pending line of text.
+				lineCharacters.push(textContent.charAt(i));
+
+			}
+
+			// At this point, we have an array (lines) of arrays (characters). Let's
+			// collapse the character buffers down into a single text value.
+			lines = lines.map((characters) => {
+
+				return (m.collapseWhiteSpace(characters.join("")));
+
+			})
+
+			for (let i in lines) {
+				if (!lines[i]) {
+					lines.splice(i, 1)
+				}
+			}
+
+			return (lines);
+
+		}
+
+
+		/**
+		 * I normalize the white-space in the given value such that the amount of white-
+		 * space matches the rendered white-space (browsers collapse strings of white-space
+		 * down to single space character, visually, and this is just updating the text to
+		 * match that behavior).
+		 */
+		m.collapseWhiteSpace = (value) => {
+			if (value == '\n') {
+				value = null
+			}
+			return value;//(value.trim().replace(/\s+/g, " "));
+
+		}
+
+
+		window.addEventListener('keydown', (e) => {
+			if (e.key == 's' && e.ctrlKey) {
+				e.preventDefault()
+				m.saveSVG()
+			}
+		})
 	})
 
 	/*Turns off the ng-scope, et al. debug classes*/
@@ -435,11 +533,9 @@ angular.module('Maker Skill Tree', [])
 
 								fOs[i].setAttribute('index', parentIndex)
 
-								console.log(1111)
 
 							}
 							else {
-								//console.log(2222)
 							}
 						}
 

@@ -93,13 +93,13 @@ foreignObject {
 }
 
 .textbox-inner {
-    font-size: 12px;
+    font-size: 10px;
     margin: 0;
     padding: 0;
-    text-overflow: ellipsis;
+    /* text-overflow: ellipsis; */
     font-family: 'Uniform Condensed Regular';
     word-break: keep-all;
-    hyphens: auto;
+    /* hyphens: auto; */
     height: calc(100% - 5px);
     width: calc(100% + 9px);
     white-space: pre-line;
