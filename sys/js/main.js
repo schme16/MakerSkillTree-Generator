@@ -170,6 +170,8 @@ angular.module('Maker Skill Tree', [])
 			return svgDoc
 		}
 
+
+		//TODO: The text tiles aren't actually centered on their spots, so probably need the same treatment as the title?
 		m.saveSVG = async (svg = document.querySelector('svg'), pdfOnly) => {
 
 			if (document.querySelector('.output svg')) {
@@ -243,7 +245,10 @@ angular.module('Maker Skill Tree', [])
 
 
 				m.preventLeaveFlag = false
+				document.querySelector('.output').replaceChildren();
+				
 				m.$applyAsync()
+
 				return svgDoc
 			}
 			else {
